@@ -1,4 +1,4 @@
-name: Build AAPS 4.0.0 (signed)
+name: Build AAPS 4.0.0 (Medtrum notification dedupe)
 
 on:
   push:
@@ -81,12 +81,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          cp source/app/build/outputs/apk/full/release/*.apk artifacts/aaps-4.0.0-full-release.apk
-          cp source/wear/build/outputs/apk/full/release/*.apk artifacts/aaps-wear-4.0.0-full-release.apk
+          cp source/app/build/outputs/apk/full/release/*.apk artifacts/aaps-4.0.0-medtrum-dedupe-full-release.apk
+          cp source/wear/build/outputs/apk/full/release/*.apk artifacts/aaps-wear-4.0.0-medtrum-dedupe-full-release.apk
           apksigner="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f -name apksigner | sort -V | tail -n 1)"
           test -x "$apksigner"
-          "$apksigner" verify --verbose artifacts/aaps-4.0.0-full-release.apk
-          "$apksigner" verify --verbose artifacts/aaps-wear-4.0.0-full-release.apk
+          "$apksigner" verify --verbose artifacts/aaps-4.0.0-medtrum-dedupe-full-release.apk
+          "$apksigner" verify --verbose artifacts/aaps-wear-4.0.0-medtrum-dedupe-full-release.apk
           (cd artifacts && sha256sum *.apk > SHA256SUMS.txt)
 
       - name: Publish downloadable APKs
