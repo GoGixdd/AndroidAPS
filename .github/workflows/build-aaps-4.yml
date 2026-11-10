@@ -16,6 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
+      - name: Checkout this repository to access the Medtrum patch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - name: Checkout verified official AndroidAPS 4.0.0 source
         shell: bash
         run: |
@@ -74,7 +79,14 @@ jobs:
 
           cd source
           chmod +x ./gradlew
-          ./gradlew :app:assembleFullRelease :wear:assembleFullRelease --no-daemon --stacktrace             -Dorg.gradle.jvmargs="-Xmx8g -XX:+UseParallelGC -Xss4m"             -Dkotlin.compiler.execution.strategy=in-process             -Dorg.gradle.workers.max=4             -Pandroid.injected.signing.store.file="$signing_file"             -Pandroid.injected.signing.store.password="$ks_password"             -Pandroid.injected.signing.key.alias="$ks_alias"             -Pandroid.injected.signing.key.password="$key_password"
+          ./gradlew :app:assembleFullRelease :wear:assembleFullRelease --no-daemon --stacktrace \
+            -Dorg.gradle.jvmargs="-Xmx8g -XX:+UseParallelGC -Xss4m" \
+            -Dkotlin.compiler.execution.strategy=in-process \
+            -Dorg.gradle.workers.max=4 \
+            -Pandroid.injected.signing.store.file="$signing_file" \
+            -Pandroid.injected.signing.store.password="$ks_password" \
+            -Pandroid.injected.signing.key.alias="$ks_alias" \
+            -Pandroid.injected.signing.key.password="$key_password"
 
       - name: Validate and package APKs
         shell: bash
