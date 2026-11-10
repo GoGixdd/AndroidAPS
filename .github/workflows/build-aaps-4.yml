@@ -2,9 +2,10 @@ name: Build AAPS 4.0.0 (signed)
 
 on:
   push:
-    branches: [master]
+    branches: [master, 'feature/aaps4-medtrum-notification-dedupe']
     paths:
       - '.github/workflows/build-aaps-4.yml'
+      - '.github/patches/aaps4-medtrum-notification-dedupe.patch'
   workflow_dispatch:
 
 permissions:
@@ -21,6 +22,15 @@ jobs:
           set -euo pipefail
           git clone --depth 1 --branch 4.0.0 https://github.com/nightscout/AndroidAPS.git source
           test "$(git -C source rev-parse HEAD)" = "f77abd9b82b308e8fc330da0d7a31370fb4a0f49"
+
+      - name: Apply verified Medtrum notification de-duplication patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd source
+          git apply --check ../.github/patches/aaps4-medtrum-notification-dedupe.patch
+          git apply ../.github/patches/aaps4-medtrum-notification-dedupe.patch
+          echo "Medtrum patch applied; critical pump alarms and Objectives remain unchanged."
 
       - name: Set up Java 21
         uses: actions/setup-java@v5
@@ -82,7 +92,7 @@ jobs:
       - name: Publish downloadable APKs
         uses: actions/upload-artifact@v4
         with:
-          name: aaps-4.0.0-signed-phone-watch
+          name: aaps-4.0.0-medtrum-dedupe-signed-phone-watch
           path: artifacts/*
           retention-days: 30
           if-no-files-found: error
