@@ -1,0 +1,22 @@
+diff --git a/pump/medtrum/src/main/kotlin/app/aaps/pump/medtrum/services/MedtrumService.kt b/pump/medtrum/src/main/kotlin/app/aaps/pump/medtrum/services/MedtrumService.kt
+--- a/pump/medtrum/src/main/kotlin/app/aaps/pump/medtrum/services/MedtrumService.kt
++++ b/pump/medtrum/src/main/kotlin/app/aaps/pump/medtrum/services/MedtrumService.kt
+@@ -663,10 +663,14 @@
+                 notificationManager.dismiss(NotificationId.PUMP_WARNING)
+                 notificationManager.dismiss(NotificationId.PUMP_ERROR)
+                 notificationManager.dismiss(NotificationId.PUMP_SUSPENDED)
+-                notificationManager.post(
+-                    NotificationId.PATCH_NOT_ACTIVE,
+-                    TextRef.AndroidRes(R.string.patch_not_active),
+-                    level = NotificationLevel.IMPORTANT)
++                // Keep the patch-inactive warning, but avoid re-posting it on each state update.
++                // If dismissed, the next stopped-state update will post it again.
++                if (notificationManager.notifications.value.none { it.id == NotificationId.PATCH_NOT_ACTIVE }) {
++                    notificationManager.post(
++                        NotificationId.PATCH_NOT_ACTIVE,
++                        TextRef.AndroidRes(R.string.patch_not_active),
++                        level = NotificationLevel.IMPORTANT)
++                }
+                 medtrumPump.setFakeTBRIfNotSet()
+                 medtrumPump.clearAlarmState()
+ 
